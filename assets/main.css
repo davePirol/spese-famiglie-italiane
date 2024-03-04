@@ -2,8 +2,9 @@ body {
     background-color: #F4FFFF;
 }
 
-footer {
+#foot {
     background-color: #757979;
     color: azure;
     margin-top: 5%;
+    margin-bottom: 0px;
 }

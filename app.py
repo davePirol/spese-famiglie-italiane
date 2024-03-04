@@ -1,6 +1,5 @@
 from dash import Dash, html, dcc, Input, Output  # pip install dash
 import plotly.express as px
-import dash_ag_grid as dag                       # pip install dash-ag-grid
 import dash_bootstrap_components as dbc          # pip install dash-bootstrap-components
 import pandas as pd                              # pip install pandas
 
@@ -152,6 +151,21 @@ app.layout = html.Div([
         html.Div([
             html.H1("Spese annuali delle famiglie italiane", className='mb-2', style={'textAlign':'center'}),
             html.P("Tutti i dati delle spese si riferiscono alla spesa mensile del nucleo familiare espressi in euro", className='mb-2', style={'textAlign':'center', 'font-style':'italic'}),
+            html.P("I grafici riportati mostrano la spesa mensile delle famiglie residenti in Italia. "+
+                   "I dati sono stati raccolti dalla banca dati dell'ISTAT. "+
+                   "Vengono riportati diversi grafici per mostrare nella maniera più adeguata ed espressiva per sottolineare:", className='mb-2', style={'textAlign':'center', 'font-style':'bold'}),
+            html.Ul([
+                html.Li("Il trend negli anni delle spese"),
+                html.Li("La relazione tra le spese e il nucleo famigliare"),
+                html.Li("Le spese in base alle categorie e sotto categorie"),
+                html.Li("Le spese in base alla regione e macro regione di residenza delle famiglie"),
+            ], style={'text-align': 'center'}),
+            html.P("L'attributo \"Coicop (DESC)\" (Classification of Individual COnsumption by Purpose, classificazione dei consumi individuali secondo lo scopo)"+
+                   " è uno standard internazionale messo a punto dalla Divisione Statistica delle Nazioni Unite. Viene usato per la "+
+                   "descrizione del tipo di spesa e se ne individuano 14 capitoli. I primi 12 relativi ai consumi delle famiglie, "+
+                   "uno relativo ai consumi individuali delle istituzioni sociali private al servizio delle famiglie, "+
+                   "l'ultimo a quelli delle amministrazioni pubbliche (non utilizzato nelle osservazioni sottostanti).", className='mb-2', style={'textAlign':'center', 'font-style':'bold'}),
+
             html.Hr(),
         ], style={"padding": "30px"}),
 
@@ -463,7 +477,7 @@ app.layout = html.Div([
                 ], width=7)
             ], style={"padding": "10%"})
         ])
-    ])
+    ], id="foot")
 ])
 
 @app.callback(
@@ -554,7 +568,8 @@ def update_over_line(region, year):
         barmode='group', 
         yaxis_title_text = 'Spesa media', 
         bargroupgap=0.1, 
-        bargap=0.2, 
+        bargap=0.2,
+        title="Grafico in scala logaritmica" 
     ) 
     fig.update_yaxes(type="log")
 
