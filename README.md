@@ -5,13 +5,13 @@ Tutti i dati sono stati raccolti dalla banca dati dell'Istat e fanno riferimento
 Nel periodo precedente i dati sono stati ricostruiti non comprendendo le sottocategorie, le regioni e particolari tipologie famigliari.
 
 Per eseguire l'applicazione, scaricare il codice, nella stessa cartella aprire il terminale ed eseguire:
-'''python app.py'''
+```python app.py```
 Requisiti dell'ambiente python:
 - dash
 - dash-bootstrap-components
 - pandas
 - matplotlib
 
-Tutti i grafici sono stati realizzato con Plotly
+Tutti i grafici sono stati realizzato con Plotly.
 
-Questo progetto è sotto licenza Creative Commons https://creativecommons.org/licenses/by-nc/4.0/ 
+*Questo progetto è sotto licenza Creative Commons https://creativecommons.org/licenses/by-nc/4.0/*
