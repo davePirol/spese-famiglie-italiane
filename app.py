@@ -153,18 +153,23 @@ app.layout = html.Div([
             html.P("Tutti i dati delle spese si riferiscono alla spesa mensile del nucleo familiare espressi in euro", className='mb-2', style={'textAlign':'center', 'font-style':'italic'}),
             html.P("I grafici riportati mostrano la spesa mensile delle famiglie residenti in Italia. "+
                    "I dati sono stati raccolti dalla banca dati dell'ISTAT. "+
-                   "Vengono riportati diversi grafici per mostrare nella maniera più adeguata ed espressiva per sottolineare:", className='mb-2', style={'textAlign':'center', 'font-style':'bold'}),
+                   "Vengono riportati diversi grafici multidimensionali per mostrare nel modo più adeguato ed espressivo:", className='mb-2', style={'font-style':'bold'}),
             html.Ul([
                 html.Li("Il trend negli anni delle spese"),
                 html.Li("La relazione tra le spese e il nucleo famigliare"),
                 html.Li("Le spese in base alle categorie e sotto categorie"),
                 html.Li("Le spese in base alla regione e macro regione di residenza delle famiglie"),
-            ], style={'text-align': 'center'}),
+            ]),
+            html.P("Sono stati analizzati due dataset, il primo, descritto dai primi quattro grafici che raccoglie i dati di spesa relativi"+
+                   " alle regioni e alle categorie di spesa nel dettaglio. Il secondo, descritto dagli ultimi quattro grafici, esprime "+
+                   "i dati relativi alle spese nelle varie tipologie di nuclei famigliari.", className='mb-2', style={'font-style':'bold'}),
             html.P("L'attributo \"Coicop (DESC)\" (Classification of Individual COnsumption by Purpose, classificazione dei consumi individuali secondo lo scopo)"+
                    " è uno standard internazionale messo a punto dalla Divisione Statistica delle Nazioni Unite. Viene usato per la "+
                    "descrizione del tipo di spesa e se ne individuano 14 capitoli. I primi 12 relativi ai consumi delle famiglie, "+
                    "uno relativo ai consumi individuali delle istituzioni sociali private al servizio delle famiglie, "+
-                   "l'ultimo a quelli delle amministrazioni pubbliche (non utilizzato nelle osservazioni sottostanti).", className='mb-2', style={'textAlign':'center', 'font-style':'bold'}),
+                   "l'ultimo a quelli delle amministrazioni pubbliche (non utilizzato nelle osservazioni sottostanti).", className='mb-2', style={'font-style':'bold'}),
+            html.P("L'attributo regione comprende anche le province di Bolzano e Trento, oltre all'intero Trentino alto Adige, "+
+                   "ma nella mappa geografica la regione è trattata tutta insieme.", className='mb-2', style={'font-style':'bold'}),
 
             html.Hr(),
         ], style={"padding": "30px"}),
@@ -330,7 +335,7 @@ app.layout = html.Div([
 
         dbc.Row([
             dbc.Col([
-                html.H2("Analisi delle spese dei nuclei famigliari nel dettaglio", style={"text-align": 'center'})
+                html.H2("Analisi delle spese dei nuclei famigliari nel dettaglio", style={"text-align": 'center', "margin-top": "10%"})
             ], width=12,className='mt-4')
         ]),
 
@@ -465,7 +470,7 @@ app.layout = html.Div([
             dbc.Row([
                 dbc.Col([
                     html.H4('Disegnato e progettato da Davide Pirolo'),
-                    html.P('Università di Pisa. Anno Accademico 2023-2024', style={'textAlign':'center', 'font-style':'italic'})
+                    html.P('Università di Pisa. Anno Accademico 2023-2024', style={'font-style':'italic'})
                 ], width=5),
                 dbc.Col([
                     html.H5('Progetto del corso di Scientific Large Data Visualization'),
