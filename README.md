@@ -6,7 +6,8 @@ Nel periodo precedente i dati sono stati ricostruiti non comprendendo le sottoca
 
 ---
 
-Per eseguire l'applicazione, scaricare il codice, nella stessa cartella aprire il terminale ed eseguire:```python app.py```\
+Per eseguire l'applicazione, scaricare il codice, nella stessa cartella aprire il terminale ed eseguire:```python app.py```. Dopodiché recarsi nel proprio browser all'indirizzo http://localhost:8002/\
+**NB: controllare di non aver attiva già qualche processo che occupi la porta 8002**
 Requisiti dell'ambiente python:
 - dash
 - dash-bootstrap-components
