@@ -14,4 +14,4 @@ Requisiti dell'ambiente python:
 
 Tutti i grafici sono stati realizzato con Plotly.
 
-*Questo progetto è sotto licenza [https://creativecommons.org/licenses/by-nc-sa/4.0](CC BY-NC-SA 4.0)*
+*Questo progetto è sotto licenza [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0)*
