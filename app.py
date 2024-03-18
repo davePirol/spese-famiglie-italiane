@@ -103,44 +103,51 @@ def change_slider_value_territory(territory):
                     )
     return result
 
+def normalize_rows(df_in):
+    normalized_df = df_in.copy()
+    normalized_df['Spesa media nn'] = normalized_df['Spesa media']
+    max_values = df_in.groupby('Coicop (DESC)')['Spesa media'].transform('max')
+    min_values = df_in.groupby('Coicop (DESC)')['Spesa media'].transform('min')
+    normalized_df['Spesa media'] = (df_in['Spesa media'] - min_values) / (max_values - min_values)
+    return normalized_df
+
 def generate_heat_map():
-    mask = df2[(df2['Territorio']=='Italia') & (df2['Coicop (DESC)'].isin(macro_category_family)) & (~df2['Coicop (DESC)'].isin(['Totale']))].groupby(
-    ['Anno', 'Coicop (DESC)', 'Tipologia famigliare']).mean('Spesa media')
+    n_df2=normalize_rows(df2)
+    mask = n_df2[(df2['Territorio']=='Italia') &
+                    (df2['Coicop (DESC)'].isin(macro_category_family)) & 
+                    (~df2['Coicop (DESC)'].isin(['Totale', 'Non alimentari']))].groupby(['Anno', 'Coicop (DESC)', 'Tipologia famigliare']).mean('Spesa media')
 
     heatmap_data = mask.pivot_table(
         index='Coicop (DESC)', 
         columns='Tipologia famigliare', 
         values='Spesa media', 
+        aggfunc='mean' 
+    ).fillna(0)
+
+    heatmap_data_nn = mask.pivot_table(
+        index='Coicop (DESC)', 
+        columns='Tipologia famigliare', 
+        values='Spesa media nn', 
         aggfunc='mean'
-    ).fillna(0)  
-    fig = px.imshow(
-        heatmap_data,
-        labels=dict(
-            x="Tipologia famigliare", 
-            y="Categoria di spesa", 
-            color="Spesa media"),
+    ).fillna(0)
+    text = [[f"Categoria di spesa: {index}<br>Tipologia famigliare: {col}<br>Spesa media in €: {heatmap_data_nn.loc[index, col]:.2f}"
+         for col in heatmap_data.columns] for index in heatmap_data.index]
+
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=heatmap_data.values,
         x=heatmap_data.columns,
         y=heatmap_data.index,
-        color_continuous_scale="burgyl",
-    )
+        hoverongaps=False,
+        text=text,
+        hoverinfo='text',
+        colorscale="burgyl",
+        showscale=False
+    ))
 
-    fig.update_layout(
-        autosize=False,
-        width=1200,  
-        height=800   
-    )
-
-    fig.update_layout(
-        legend=dict(
-            x=3,  # The x position of the legend (1 is the far right)
-            y=1,  # The y position of the legend (1 is the top)
-            xanchor='right',  # Anchor point for the x position
-            yanchor='top',    # Anchor point for the y position
-            tracegroupgap=5,  # Space between trace groups in legend
-            itemwidth=30,     # The width of legend items (symbols)
-            itemsizing='trace'  # Controls if the legend items symbols scale with their corresponding trace
-        )
-    )
+    fig.update(layout_coloraxis_showscale=False)
+    fig.update_coloraxes(showscale=False, colorbar=None)
+    fig.update_layout(height=700)
 
     
     return dcc.Graph(figure=fig)
@@ -150,7 +157,7 @@ app.layout = html.Div([
     dbc.Container([
         html.Div([
             html.H1("Spese annuali delle famiglie italiane", className='mb-2', style={'textAlign':'center'}),
-            html.P("Tutti i dati delle spese si riferiscono alla spesa mensile del nucleo familiare espressi in euro", className='mb-2', style={'textAlign':'center', 'font-style':'italic'}),
+            html.P("Tutti i dati delle spese si riferiscono alla spesa mensile per ogni anno del nucleo familiare espressi in euro", className='mb-2', style={'textAlign':'center', 'font-style':'italic'}),
             html.P("I grafici riportati mostrano la spesa mensile delle famiglie residenti in Italia. "+
                    "I dati sono stati raccolti dalla banca dati dell'ISTAT. "+
                    "Vengono riportati diversi grafici multidimensionali per mostrare nel modo più adeguato ed espressivo:", className='mb-2', style={'font-style':'bold'}),
@@ -423,7 +430,7 @@ app.layout = html.Div([
                 dbc.Col([
                     generate_heat_map(),
                 ], width=12, className='mt-25')
-            ], style={"margin-top": "25px", "text-align": "center"}),
+            ], style={"margin-top": "25px"}),
 
 
         ], style={'border': 'solid 3px #F3B95F', 'border-radius': '20px', 'padding': '20px', 'margin-top': '5%'}),
@@ -522,7 +529,9 @@ def update_over_line(region, components):
             yanchor='top',
             orientation='h',
             x=0.5
-        ))
+        ),
+        legend_title_text='Prodotti'
+    )
     fig_area.update_layout(
         autosize=True,
         margin=dict(l=30, r=0, t=30, b=30),
@@ -532,7 +541,8 @@ def update_over_line(region, components):
             yanchor='top',
             orientation='h',
             x=0.5
-        )
+        ),
+        legend_title_text='Prodotti'
     )
 
     return fig_line, fig_area
@@ -574,7 +584,8 @@ def update_over_line(region, year):
         yaxis_title_text = 'Spesa media', 
         bargroupgap=0.1, 
         bargap=0.2,
-        title="Grafico in scala logaritmica" 
+        title="Grafico delle spese mensili medie in scala logaritmica",
+        legend_title_text='Componenti famigliari' 
     ) 
     fig.update_yaxes(type="log")
 
@@ -643,8 +654,10 @@ def main_callback_logic(year, tab, components):
 
     if tab == "treemap":
         fig = px.treemap(
-            dff, path=[px.Constant("ALL"), "Root", "First_level", "Coicop (DESC)"], 
+            dff, 
+            path=[px.Constant("ALL"), "Root", "First_level", "Coicop (DESC)"], 
             values='Spesa media', labels={'id': 'Coicop (DESC)'},
+            branchvalues='total'
         )
     else:
         fig = px.sunburst(
@@ -652,8 +665,10 @@ def main_callback_logic(year, tab, components):
             values='Spesa media', labels={'id': 'Coicop (DESC)'}
         )
 
-    fig.update_traces(root_color="lightgrey")
+    #fig.update_traces(root_color="lightgrey")
+    fig.update_layout(height=900)
     fig.update_layout(margin=dict(t=50, l=25, r=25, b=25))
+    fig.update_traces(hovertemplate='Spesa media: %{value}€')
 
     return dcc.Graph(figure=fig)
 
@@ -676,7 +691,7 @@ def main_callback_logic(year, family):
         color=mask["Territorio"],
         template="plotly_white",
         log_r=True,
-        title="Spesa per categoria suddivise in regioni (in scala logaritmica)",
+        title="Spesa mensile media per categoria suddivise in regioni (in scala logaritmica)",
         category_orders={"Territorio": territories_sorted_by_spesa.tolist()}
     )
     return fig
@@ -707,17 +722,23 @@ def main_callback_logic(year, territory):
     mask = df2[(df2['Anno']==year) &(df2['Territorio']==territory) & (df2['Coicop (DESC)'].isin(macro_category_family)) & (~df2['Coicop (DESC)'].isin(['Totale']))]
 
     fig=px.scatter(
-                mask,
-                x="Tipologia famigliare",
-                y="Coicop (DESC)",
-                size="Spesa media",
-                color="Spesa media",
-                color_continuous_scale="hot"
-            )
+        mask,
+        x="Tipologia famigliare",
+        y="Coicop (DESC)",
+        size="Spesa media",
+        color="Spesa media",
+        color_continuous_scale="hot",
+        labels={
+            "Coicop (DESC)": "Categoria di prodotti",
+        }
+    )
     fig.update_layout(
         xaxis={'type': 'category'},  
         yaxis={'type': 'category'}
     )
+    fig.update_layout(height=700)
+
+
     return fig
 
 if __name__ == '__main__':
